@@ -1,0 +1,70 @@
+{
+	"name": "pl_ingestion_driver",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data_driver",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"sink": {
+						"type": "JsonSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "JsonWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_http_server",
+						"type": "DatasetReference",
+						"parameters": {
+							"relative_url": "drivers.json?limit=1000"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_adls_storage",
+						"type": "DatasetReference",
+						"parameters": {
+							"directory_path": {
+								"value": "@concat('bronze/drivers/',string(utcnow('yyyyMMdd')))",
+								"type": "Expression"
+							},
+							"filename": "drivers.json"
+						}
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "ingestion"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-04-12T18:05:40Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
